@@ -1,4 +1,4 @@
-﻿using CounterStrikeSharp.API;
+using CounterStrikeSharp.API;
 using CounterStrikeSharp.API.Core;
 using CounterStrikeSharp.API.Core.Translations;
 using CounterStrikeSharp.API.Modules.Commands;
@@ -217,6 +217,8 @@ private static string GetWeaponDisplayName(string weaponName)
     
     private static bool CanUseWeaponMenu(CCSPlayerController player)
     {
+        if (Config?.PluginSettings.AllowWeaponsMenuForAll == true)
+            return true;
         return PlayerHasFeature(player, service => service.WeaponMenu.Enabled);
     }
     
@@ -240,6 +242,20 @@ private static string GetWeaponDisplayName(string weaponName)
             {
                 Console.WriteLine($"[Mesharsky - VIP] Weapon menu config found via external permissions for player {player.PlayerName}, service {service.Name}");
                 return service.WeaponMenu;
+            }
+        }
+
+        // Global allow: pick the first enabled weapon menu from configured services
+        if (Config?.PluginSettings.AllowWeaponsMenuForAll == true)
+        {
+            foreach (var group in Config.GroupSettings)
+            {
+                var service = ServiceManager.GetService(group.Name);
+                if (service != null && service.WeaponMenu.Enabled)
+                {
+                    Console.WriteLine($"[Mesharsky - VIP] Weapon menu config enabled for all players via '{service.Name}'");
+                    return service.WeaponMenu;
+                }
             }
         }
         

@@ -31,6 +31,7 @@ public partial class MesharskyVip
         public bool BonusesList { get; set; }
         public string? BypassFlag { get; set; }
         public string? BypassFlagGive { get; set; }
+        public bool AllowWeaponsMenuForAll { get; set; } = false;
     }
 
     public class NightVipConfig

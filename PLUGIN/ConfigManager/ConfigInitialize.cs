@@ -22,8 +22,8 @@ public partial class MesharskyVip
             Username = dbTable["username"].ToString(),
             Database = dbTable["database"].ToString(),
             Password = dbTable["password"].ToString(),
-            Port = int.Parse(dbTable["port"].ToString()),
-            TablePrefix = dbTable["table_prefix"].ToString()
+            Port = (dbTable.TryGetValue("port", out var portObj) && int.TryParse(portObj?.ToString(), out var parsedPort)) ? parsedPort : 3306,
+            TablePrefix = dbTable.TryGetValue("table_prefix", out var prefixObj) ? prefixObj?.ToString() ?? "" : ""
         };
 
         var pluginTable = (TomlTable)model["PluginSettings"];
@@ -35,6 +35,10 @@ public partial class MesharskyVip
             BypassFlag = pluginTable["bypass_flag"].ToString(),
             BypassFlagGive = pluginTable["bypass_flag_give"].ToString()
         };
+        if (pluginTable.TryGetValue("allow_weapons_menu_for_all", out var allowAllObj) && allowAllObj is bool allowAll)
+        {
+            pluginSettings.AllowWeaponsMenuForAll = allowAll;
+        }
         
         var vipTestConfig = new VipTestConfig();
         if (model.TryGetValue("VipTest", out var vipTestTableObj) && vipTestTableObj is TomlTable vipTestTable)
